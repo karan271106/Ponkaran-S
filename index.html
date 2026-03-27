@@ -1,0 +1,824 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Pon Karan — UI/UX Designer</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,300&display=swap" rel="stylesheet" />
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            sand:  { 50:'#faf8f5', 100:'#f3ede4', 200:'#e8ddd0', 300:'#d9c9b6', 400:'#c5ae95', 500:'#b09478' },
+            moss:  { 400:'#7a9e7e', 500:'#5f866a', 600:'#4a6e55' },
+            ink:   { 900:'#1a1f2e', 800:'#252b3b' },
+          },
+          fontFamily: {
+            serif: ['"DM Serif Display"', 'serif'],
+            sans:  ['"DM Sans"', 'sans-serif'],
+          },
+        }
+      }
+    }
+  </script>
+  <style>
+    *{box-sizing:border-box}
+    html{font-family:'DM Sans',sans-serif}
+    body{background:#faf8f5;color:#1a1f2e;overflow-x:hidden}
+
+    /* subtle grain */
+    body::before{content:'';position:fixed;inset:0;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.035'/%3E%3C/svg%3E");pointer-events:none;z-index:0;opacity:.5}
+
+    /* blobs */
+    .blob{position:absolute;border-radius:50%;filter:blur(80px);pointer-events:none;z-index:0}
+
+    /* nav underline */
+    .nav-link{position:relative}
+    .nav-link::after{content:'';position:absolute;bottom:-2px;left:0;width:0;height:1.5px;background:#7a9e7e;transition:width .3s ease}
+    .nav-link:hover::after{width:100%}
+
+    /* cards */
+    .card-lift{transition:transform .35s cubic-bezier(.22,.68,0,1.2),box-shadow .35s ease}
+    .card-lift:hover{transform:translateY(-6px);box-shadow:0 24px 48px rgba(26,31,46,.10)}
+
+    /* skill badges */
+    .skill-badge{transition:background .25s,color .25s,transform .25s;cursor:default}
+    .skill-badge:hover{background:#1a1f2e;color:#faf8f5;transform:scale(1.05)}
+
+    /* inputs */
+    .form-input:focus{outline:none;border-color:#7a9e7e;box-shadow:0 0 0 3px rgba(122,158,126,.15)}
+
+    /* scroll reveal */
+    .reveal{opacity:0;transform:translateY(28px);transition:opacity .7s ease,transform .7s ease}
+    .revealed{opacity:1;transform:translateY(0)}
+
+    /* project image zoom */
+    .proj-img{transition:transform .5s ease}
+    .card-lift:hover .proj-img{transform:scale(1.04)}
+
+    /* mobile menu */
+    #mobile-menu{transition:max-height .4s ease,opacity .3s ease;max-height:0;opacity:0;overflow:hidden}
+    #mobile-menu.open{max-height:360px;opacity:1}
+
+    /* buttons */
+    .btn-dark{background:#1a1f2e;color:#faf8f5;transition:background .25s,transform .2s}
+    .btn-dark:hover{background:#2d3346;transform:translateY(-1px)}
+    .btn-outline{border:1.5px solid #1a1f2e;color:#1a1f2e;transition:background .25s,color .25s,transform .2s}
+    .btn-outline:hover{background:#1a1f2e;color:#faf8f5;transform:translateY(-1px)}
+
+    /* social */
+    .social-icon{transition:transform .2s,color .2s}
+    .social-icon:hover{transform:translateY(-3px);color:#7a9e7e}
+
+    /* progress bar animation */
+    @keyframes growBar{from{width:0}to{width:var(--w)}}
+    .bar{animation:growBar 1.2s ease forwards;animation-play-state:paused}
+    .bar.animate{animation-play-state:running}
+
+    /* quote mark */
+    .quote-mark{font-family:'DM Serif Display',serif;font-size:5rem;line-height:1;color:#e8ddd0;position:absolute;top:.5rem;right:1.5rem;select:none}
+
+    /* tag */
+    .tag{font-size:.68rem;letter-spacing:.06em;text-transform:uppercase;font-weight:600}
+
+    /* dot */
+    .dot{width:8px;height:8px;border-radius:50%;background:#7a9e7e;display:inline-block}
+
+    @keyframes pulse-soft{0%,100%{opacity:.5}50%{opacity:1}}
+    .animate-pulse-soft{animation:pulse-soft 2.8s ease-in-out infinite}
+
+    @keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-12px)}}
+    .animate-float{animation:float 5s ease-in-out infinite}
+  </style>
+</head>
+<body class="relative">
+
+<!-- ========== NAV ========== -->
+<nav class="fixed top-0 inset-x-0 z-50 bg-[#faf8f5]/85 backdrop-blur-lg border-b border-[#e8ddd0]">
+  <div class="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between">
+    <a href="#hero" class="font-serif text-xl text-[#1a1f2e] tracking-tight">Pon Karan S<span class="text-[#7a9e7e]">.</span></a>
+
+    <ul class="hidden md:flex items-center gap-8 text-sm font-medium text-[#1a1f2e]/60">
+      <li><a href="#about"        class="nav-link hover:text-[#1a1f2e] transition-colors">About</a></li>
+      <li><a href="#skills"       class="nav-link hover:text-[#1a1f2e] transition-colors">Skills</a></li>
+      <li><a href="#projects"     class="nav-link hover:text-[#1a1f2e] transition-colors">Projects</a></li>
+      <li><a href="#testimonials" class="nav-link hover:text-[#1a1f2e] transition-colors">Testimonials</a></li>
+      <li><a href="#contact"      class="nav-link hover:text-[#1a1f2e] transition-colors">Contact</a></li>
+    </ul>
+
+    <a href="https://wa.me/919344883713?text=Hi%20Ponkaran%2C%20I%20recently%20viewed%20your%20projects%20and%20was%20impressed.%20Shall%20we%20connect%3F" class="hidden md:inline-flex btn-dark text-sm font-medium px-5 py-2.5 rounded-full shadow-md shadow-[#1a1f2e]/10">
+      Let's Talk
+    </a>
+
+    <button id="menu-btn" class="md:hidden p-2 rounded-lg text-[#1a1f2e]" onclick="toggleMenu()">
+      <svg id="icon-open"  class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16"/></svg>
+      <svg id="icon-close" class="w-5 h-5 hidden" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
+    </button>
+  </div>
+
+  <div id="mobile-menu" class="md:hidden bg-[#faf8f5] border-t border-[#e8ddd0] px-6">
+    <ul class="flex flex-col gap-4 py-5 text-sm font-medium text-[#1a1f2e]/70">
+      <li><a href="#about"        onclick="toggleMenu()" class="hover:text-[#5f866a] transition-colors">About</a></li>
+      <li><a href="#skills"       onclick="toggleMenu()" class="hover:text-[#5f866a] transition-colors">Skills</a></li>
+      <li><a href="#projects"     onclick="toggleMenu()" class="hover:text-[#5f866a] transition-colors">Projects</a></li>
+      <li><a href="#testimonials" onclick="toggleMenu()" class="hover:text-[#5f866a] transition-colors">Testimonials</a></li>
+      <li><a href="#contact"      onclick="toggleMenu()" class="hover:text-[#5f866a] transition-colors">Contact</a></li>
+      <li><a href="https://wa.me/919344883713?text=Hi%20Ponkaran%2C%20I%20recently%20viewed%20your%20projects%20and%20was%20impressed.%20Shall%20we%20connect%3F"      onclick="toggleMenu()" class="btn-dark inline-flex w-full justify-center px-5 py-3 rounded-full text-center mt-1">Let's Talk</a></li>
+    </ul>
+  </div>
+</nav>
+
+<!-- ========== HERO ========== -->
+<section id="hero" class="relative min-h-screen flex items-center justify-center overflow-hidden pt-20">
+  <div class="blob w-[28rem] h-[28rem] bg-[#7a9e7e]/15 top-0 -left-28"></div>
+  <div class="blob w-80 h-80 bg-[#d9c9b6]/50 bottom-0 right-0"></div>
+  <div class="blob w-64 h-64 bg-[#e8ddd0]/70 top-1/3 right-1/4 animate-pulse-soft"></div>
+
+  <div class="relative z-10 max-w-4xl mx-auto px-6 text-center">
+    <div class="inline-flex items-center gap-2 bg-white/70 border border-[#e8ddd0] rounded-full px-4 py-1.5 text-xs font-medium text-[#1a1f2e]/55 mb-8 shadow-sm">
+      <span class="dot animate-pulse-soft"></span>
+      Available for opportunities
+    </div>
+
+    <h1 class="font-serif text-5xl sm:text-6xl md:text-7xl lg:text-[5.5rem] text-[#1a1f2e] leading-[1.08] mb-6">
+      Hi, I'm<br/>
+      <em class="not-italic text-[#5f866a]">Pon Karan</em>
+    </h1>
+
+    <p class="text-lg sm:text-xl font-light text-[#1a1f2e]/55 mb-3">UI/UX Designer Aspirant</p>
+    <p class="text-base text-[#1a1f2e]/45 max-w-md mx-auto mb-12 leading-relaxed font-light">
+      Crafting intuitive digital experiences with empathy, curiosity, and a keen eye for detail — one pixel at a time.
+    </p>
+
+    <div class="flex flex-col sm:flex-row gap-4 justify-center items-center">
+      <a href="#projects" class="btn-dark px-8 py-3.5 rounded-full font-medium text-sm inline-flex items-center gap-2 shadow-lg shadow-[#1a1f2e]/12">
+        View Projects
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg>
+      </a>
+      <a href="#contact" class="btn-outline px-8 py-3.5 rounded-full font-medium text-sm inline-flex items-center gap-2">
+        Contact Me
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+      </a>
+    </div>
+
+    <!-- scroll cue -->
+    <div class="mt-20 flex flex-col items-center gap-2 text-[#1a1f2e]/25">
+      <span class="text-[.65rem] font-semibold tracking-[.2em] uppercase">Scroll</span>
+      <div class="w-px h-10 bg-gradient-to-b from-[#1a1f2e]/20 to-transparent"></div>
+    </div>
+  </div>
+</section>
+
+<!-- ========== ABOUT ========== -->
+<section id="about" class="py-24 lg:py-32 relative overflow-hidden">
+  <div class="blob w-72 h-72 bg-[#e8ddd0]/60 -right-20 top-10"></div>
+
+  <div class="max-w-6xl mx-auto px-6 relative z-10">
+    <div class="grid md:grid-cols-2 gap-16 lg:gap-24 items-center">
+
+      <!-- image -->
+      <div class="reveal flex justify-center md:justify-start order-1 md:order-none">
+        <div class="relative">
+          <div class="absolute -inset-4 rounded-[2rem] border-2 border-dashed border-[#d9c9b6] rotate-3 pointer-events-none"></div>
+          <div class="relative w-72 h-80 lg:w-80 lg:h-96 rounded-[1.75rem] overflow-hidden bg-gradient-to-br from-[#e8ddd0] to-[#d9c9b6] shadow-2xl shadow-[#d9c9b6]/50">
+            <div class="absolute inset-0 flex flex-col items-center justify-center gap-3">
+              <div class="w-20 h-20 rounded-full bg-[#c5ae95]/40 flex items-center justify-center">
+                <svg class="w-10 h-10 text-[#b09478]" fill="currentColor" viewBox="0 0 24 24"><path d="M12 12c2.7 0 4.8-2.1 4.8-4.8S14.7 2.4 12 2.4 7.2 4.5 7.2 7.2 9.3 12 12 12zm0 2.4c-3.2 0-9.6 1.6-9.6 4.8v2.4h19.2v-2.4c0-3.2-6.4-4.8-9.6-4.8z"/></svg>
+              </div>
+              <img src="trialme2.jpg" 
+       alt="Pon Karan" 
+       class="w-full h-full object-cover"><span class="text-[#b09478] text-sm font-medium">Profile Photo</span>
+            </div>
+            <div class="absolute bottom-0 inset-x-0 h-1.5 bg-gradient-to-r from-[#7a9e7e] to-[#5f866a]"></div>
+          </div>
+          <div class="absolute -bottom-5 -right-5 bg-white rounded-2xl px-4 py-2.5 shadow-xl border border-[#f3ede4] flex items-center gap-2 animate-float">
+            
+            <span class="w-2.5 h-2.5 rounded-full bg-[#7a9e7e] animate-pulse-soft"></span>
+            <span class="text-xs font-semibold text-[#1a1f2e]">Open to Work</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- text -->
+      <div class="reveal order-2 md:order-none">
+        <div class="flex items-center gap-3 mb-5">
+          <span class="dot"></span>
+          <span class="text-xs font-semibold tracking-widest uppercase text-[#5f866a]">About Me</span>
+        </div>
+        <h2 class="font-serif text-4xl lg:text-5xl text-[#1a1f2e] leading-tight mb-6">
+          Designing with<br/><em class="not-italic text-[#5f866a]">purpose</em> &amp; empathy
+        </h2>
+        <p class="text-[#1a1f2e]/55 leading-relaxed mb-5 font-light">
+          I'm a UI/UX designer aspirant with a deep passion for creating digital experiences that feel effortless and meaningful. I believe great design is invisible — it simply works, and works beautifully.
+        </p>
+        <p class="text-[#1a1f2e]/55 leading-relaxed mb-8 font-light">
+          Currently sharpening my craft in user research, wireframing, and interaction design. I thrive at the intersection of creativity and logic — turning complex problems into clean, human-centered solutions.
+        </p>
+
+        <div class="grid grid-cols-3 gap-4">
+          <div class="bg-white rounded-2xl p-4 border border-[#f3ede4] shadow-sm text-center card-lift">
+            <p class="font-serif text-3xl text-[#1a1f2e]">4+</p>
+            <p class="text-xs text-[#1a1f2e]/45 mt-1 font-medium">Projects</p>
+          </div>
+          <div class="bg-white rounded-2xl p-4 border border-[#f3ede4] shadow-sm text-center card-lift">
+            <p class="font-serif text-3xl text-[#1a1f2e]">2+</p>
+            <p class="text-xs text-[#1a1f2e]/45 mt-1 font-medium">Clients</p>
+          </div>
+          <div class="bg-white rounded-2xl p-4 border border-[#f3ede4] shadow-sm text-center card-lift">
+            <p class="font-serif text-3xl text-[#1a1f2e]">∞</p>
+            <p class="text-xs text-[#1a1f2e]/45 mt-1 font-medium">Curiosity</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ========== SKILLS ========== -->
+<section id="skills" class="py-24 lg:py-32 bg-[#1a1f2e] relative overflow-hidden">
+  <div class="blob w-96 h-96 bg-[#5f866a]/10 -left-20 top-0"></div>
+  <div class="blob w-64 h-64 bg-[#d9c9b6]/05 right-0 bottom-0"></div>
+
+  <div class="max-w-6xl mx-auto px-6 relative z-10">
+    <div class="text-center mb-16 reveal">
+      <div class="flex items-center justify-center gap-3 mb-5">
+        <span class="w-2 h-2 rounded-full bg-[#7a9e7e]"></span>
+        <span class="text-xs font-semibold tracking-widest uppercase text-[#7a9e7e]">Skills</span>
+      </div>
+      <h2 class="font-serif text-4xl lg:text-5xl text-[#faf8f5] leading-tight">
+        Tools &amp; <em class="not-italic text-[#7a9e7e]">Capabilities</em>
+      </h2>
+      <p class="text-[#d9c9b6]/50 mt-4 max-w-md mx-auto font-light text-sm">
+        A growing toolkit built through passion, practice, and relentless learning.
+      </p>
+    </div>
+
+    <div class="grid sm:grid-cols-3 gap-6 reveal">
+      <!-- Design -->
+      <div class="bg-white/5 border border-white/10 rounded-3xl p-7 backdrop-blur-sm card-lift">
+        <div class="w-11 h-11 rounded-2xl bg-[#5f866a]/20 flex items-center justify-center mb-5">
+          <svg class="w-5 h-5 text-[#7a9e7e]" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+          </svg>
+        </div>
+        <h3 class="text-[#f3ede4] font-semibold mb-4 text-lg">Design</h3>
+        <div class="flex flex-wrap gap-2">
+          <span class="skill-badge bg-white/10 text-[#d9c9b6] text-xs font-medium px-3.5 py-1.5 rounded-full">UI Design</span>
+          <span class="skill-badge bg-white/10 text-[#d9c9b6] text-xs font-medium px-3.5 py-1.5 rounded-full">UX Research</span>
+          <span class="skill-badge bg-white/10 text-[#d9c9b6] text-xs font-medium px-3.5 py-1.5 rounded-full">Wireframing</span>
+          <span class="skill-badge bg-white/10 text-[#d9c9b6] text-xs font-medium px-3.5 py-1.5 rounded-full">Prototyping</span>
+        </div>
+      </div>
+
+      <!-- Tools -->
+      <div class="bg-white/5 border border-white/10 rounded-3xl p-7 backdrop-blur-sm card-lift">
+        <div class="w-11 h-11 rounded-2xl bg-[#5f866a]/20 flex items-center justify-center mb-5">
+          <svg class="w-5 h-5 text-[#7a9e7e]" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/>
+            <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+          </svg>
+        </div>
+        <h3 class="text-[#f3ede4] font-semibold mb-4 text-lg">Tools</h3>
+        <div class="flex flex-wrap gap-2">
+          <span class="skill-badge bg-white/10 text-[#d9c9b6] text-xs font-medium px-3.5 py-1.5 rounded-full">Figma</span>
+          <span class="skill-badge bg-white/10 text-[#d9c9b6] text-xs font-medium px-3.5 py-1.5 rounded-full">Canva</span>
+        </div>
+      </div>
+
+      <!-- Dev -->
+      <div class="bg-white/5 border border-white/10 rounded-3xl p-7 backdrop-blur-sm card-lift">
+        <div class="w-11 h-11 rounded-2xl bg-[#5f866a]/20 flex items-center justify-center mb-5">
+          <svg class="w-5 h-5 text-[#7a9e7e]" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"/>
+          </svg>
+        </div>
+        <h3 class="text-[#f3ede4] font-semibold mb-4 text-lg">Frontend</h3>
+        <div class="flex flex-wrap gap-2">
+          <span class="skill-badge bg-white/10 text-[#d9c9b6] text-xs font-medium px-3.5 py-1.5 rounded-full">HTML</span>
+          <span class="skill-badge bg-white/10 text-[#d9c9b6] text-xs font-medium px-3.5 py-1.5 rounded-full">CSS</span>
+          <span class="skill-badge bg-white/10 text-[#d9c9b6] text-xs font-medium px-3.5 py-1.5 rounded-full">Basic Frontend</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- proficiency bars -->
+    <div class="mt-10 grid sm:grid-cols-2 gap-5 reveal">
+      <div class="bg-white/5 border border-white/10 rounded-2xl p-6">
+        <div class="flex justify-between mb-2.5"><span class="text-[#d9c9b6] text-sm font-medium">UI Design</span><span class="text-[#7a9e7e] text-sm font-semibold">85%</span></div>
+        <div class="h-1.5 bg-white/10 rounded-full overflow-hidden"><div class="bar h-full rounded-full bg-gradient-to-r from-[#7a9e7e] to-[#5f866a]" style="--w:85%"></div></div>
+      </div>
+      <div class="bg-white/5 border border-white/10 rounded-2xl p-6">
+        <div class="flex justify-between mb-2.5"><span class="text-[#d9c9b6] text-sm font-medium">Figma</span><span class="text-[#7a9e7e] text-sm font-semibold">80%</span></div>
+        <div class="h-1.5 bg-white/10 rounded-full overflow-hidden"><div class="bar h-full rounded-full bg-gradient-to-r from-[#7a9e7e] to-[#5f866a]" style="--w:80%"></div></div>
+      </div>
+      <div class="bg-white/5 border border-white/10 rounded-2xl p-6">
+        <div class="flex justify-between mb-2.5"><span class="text-[#d9c9b6] text-sm font-medium">UX Research</span><span class="text-[#7a9e7e] text-sm font-semibold">72%</span></div>
+        <div class="h-1.5 bg-white/10 rounded-full overflow-hidden"><div class="bar h-full rounded-full bg-gradient-to-r from-[#7a9e7e] to-[#5f866a]" style="--w:72%"></div></div>
+      </div>
+      <div class="bg-white/5 border border-white/10 rounded-2xl p-6">
+        <div class="flex justify-between mb-2.5"><span class="text-[#d9c9b6] text-sm font-medium">Prototyping</span><span class="text-[#7a9e7e] text-sm font-semibold">75%</span></div>
+        <div class="h-1.5 bg-white/10 rounded-full overflow-hidden"><div class="bar h-full rounded-full bg-gradient-to-r from-[#7a9e7e] to-[#5f866a]" style="--w:75%"></div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ========== PROJECTS ========== -->
+<style>
+  /* ── Carousel ── */
+  .cs-viewport{position:relative;overflow:hidden;height:13rem;border-radius:0}
+  .cs-track{display:flex;height:100%;transition:transform .48s cubic-bezier(.4,0,.2,1);will-change:transform}
+  .cs-slide{flex:0 0 100%;height:100%;position:relative}
+
+  /* arrow buttons */
+  .cs-btn{
+    position:absolute;top:50%;transform:translateY(-50%);z-index:20;
+    width:2rem;height:2rem;border-radius:50%;
+    background:rgba(255,255,255,.85);backdrop-filter:blur(6px);
+    border:1px solid rgba(255,255,255,.6);
+    display:flex;align-items:center;justify-content:center;
+    cursor:pointer;transition:background .2s,transform .2s;
+    box-shadow:0 2px 8px rgba(26,31,46,.12);
+  }
+  .cs-btn:hover{background:#fff;transform:translateY(-50%) scale(1.1)}
+  .cs-btn.prev{left:.75rem}
+  .cs-btn.next{right:.75rem}
+  .cs-btn svg{width:14px;height:14px;stroke:#1a1f2e;stroke-width:2.5;fill:none}
+
+  /* counter badge */
+  .cs-counter{
+    position:absolute;bottom:.75rem;right:.75rem;z-index:20;
+    background:rgba(26,31,46,.55);backdrop-filter:blur(6px);
+    color:#fff;font-size:.65rem;font-weight:600;letter-spacing:.04em;
+    padding:.2rem .6rem;border-radius:999px;
+  }
+
+  /* paused state on hover */
+  .cs-card:hover .cs-track{ animation-play-state:paused }
+</style>
+
+<section id="projects" class="py-24 lg:py-32 relative overflow-hidden">
+  <div class="blob w-80 h-80 bg-[#e8ddd0]/60 -left-20 bottom-0"></div>
+
+  <div class="max-w-6xl mx-auto px-6 relative z-10">
+    <div class="text-center mb-16 reveal">
+      <div class="flex items-center justify-center gap-3 mb-5">
+        <span class="dot"></span>
+        <span class="text-xs font-semibold tracking-widest uppercase text-[#5f866a]">Portfolio</span>
+      </div>
+      <h2 class="font-serif text-4xl lg:text-5xl text-[#1a1f2e] leading-tight">
+        Selected <em class="not-italic text-[#5f866a]">Projects</em>
+      </h2>
+      <p class="text-[#1a1f2e]/45 mt-4 max-w-md mx-auto font-light text-sm">A curated set of case studies exploring real-world UX challenges.</p>
+    </div>
+
+    <div class="grid md:grid-cols-2 gap-7">
+
+      <!-- ── P1: Food Delivery ── -->
+      <div class="reveal card-lift cs-card bg-white rounded-3xl overflow-hidden border border-[#f3ede4] shadow-sm" data-carousel>
+        <!-- slider viewport -->
+        <div class="cs-viewport">
+          <div class="cs-track">
+            <!-- slide 1 -->
+            <div class="cs-slide bg-gradient-to-br from-orange-100 via-amber-50 to-[#f3ede4] flex flex-col items-center justify-center gap-3">
+              
+              <img src="pro1.jpg" alt=""><div class="w-16 h-16 rounded-2xl bg-orange-200/80 flex items-center justify-center shadow-sm">
+              </div>
+              <span class="text-orange-400/60 text-xs font-medium tracking-wide">Home Screen</span>
+            </div>
+            <!-- slide 2 -->
+            <div class="cs-slide bg-gradient-to-br from-orange-200 via-orange-100 to-amber-50 flex flex-col items-center justify-center gap-3">
+              <img src="pro12.jpg" alt=""><div class="w-16 h-16 rounded-2xl bg-orange-300/60 flex items-center justify-center shadow-sm">
+              </div>
+              <span class="text-orange-500/60 text-xs font-medium tracking-wide">Menu Flow</span>
+            </div>
+            <!-- slide 3 -->
+            <div class="cs-slide bg-gradient-to-br from-amber-100 via-orange-50 to-[#f3ede4] flex flex-col items-center justify-center gap-3">
+              <img src="pro13.jpg" alt=""><div class="w-16 h-16 rounded-2xl bg-amber-200/80 flex items-center justify-center shadow-sm">
+              </div>
+              <span class="text-amber-500/60 text-xs font-medium tracking-wide">Checkout Screen</span>
+            </div>
+          
+          </div>
+          <!-- tags -->
+          <div class="absolute top-4 left-4 flex gap-2 z-10">
+          </div>
+          <!-- arrows -->
+          <button class="cs-btn prev" onclick="csMove(this,-1)" aria-label="Previous">
+            <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M15 19l-7-7 7-7"/></svg>
+          </button>
+          <button class="cs-btn next" onclick="csMove(this,1)" aria-label="Next">
+            <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M9 5l7 7-7 7"/></svg>
+          </button>
+          <!-- counter -->
+          <div class="cs-counter"><span class="cs-cur">1</span> / <span class="cs-tot">5</span></div>
+        </div>
+        <div class="p-7">
+          <h3 class="font-serif text-2xl text-[#1a1f2e] mb-2">Food Delivery App UI</h3>
+          <p class="text-[#1a1f2e]/50 text-sm leading-relaxed mb-6 font-light">
+KHUSHI is a UI/UX concept for a modern travel experience platform designed to provide a smooth and engaging user journey from exploration to booking. The platform allows users to search destinations, discover hidden gems, plan trips, manage bookings and payments, and access personalized account details through an intuitive dashboard. The design focuses on clean layouts, soft shadows, strong typography, and a vibrant yet balanced color palette to create a fresh and user-friendly interface. Key screens include a landing page, destination explorer, user dashboard, trip ticket UI, and payment card UI, all crafted to feel like a real-world product. This project helped me strengthen my ability to design complete user flows while balancing aesthetics with usability.          </p>
+          <a href="https://www.linkedin.com/posts/pon-karan_uiux-uidesign-uxdesign-activity-7400892771332710401-rHtX?utm_source=share&utm_medium=member_desktop&rcm=ACoAAE4DxVoB6oNf9r4WqpzbplMttA2_uB13OnA" class="inline-flex items-center gap-2 text-sm font-semibold text-[#5f866a] hover:text-[#4a6e55] transition-colors group">
+            know more
+            <svg class="w-4 h-4 transition-transform group-hover:translate-x-1" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg>
+          </a>
+        </div>
+      </div>
+
+      <!-- ── P2: E-commerce ── -->
+      <div class="reveal card-lift cs-card bg-white rounded-3xl overflow-hidden border border-[#f3ede4] shadow-sm" data-carousel>
+        <div class="cs-viewport">
+          <div class="cs-track">
+            <div class="cs-slide bg-gradient-to-br from-violet-100 via-purple-50 to-[#f3ede4] flex flex-col items-center justify-center gap-3">
+              <img src="pro2.jpg" alt=""><div class="w-16 h-16 rounded-2xl bg-orange-200/80 flex items-center justify-center shadow-sm">
+              </div>
+              <span class="text-violet-400/60 text-xs font-medium tracking-wide">Landing Page</span>
+            </div>
+            <div class="cs-slide bg-gradient-to-br from-purple-100 via-violet-100 to-fuchsia-50 flex flex-col items-center justify-center gap-3">
+              <img src="pro21.jpg" alt=""><div class="w-16 h-16 rounded-2xl bg-orange-200/80 flex items-center justify-center shadow-sm">
+                <svg class="w-8 h-8 text-purple-500" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 10h16M4 14h16M4 18h16"/></svg>
+              </div>
+              <span class="text-purple-400/60 text-xs font-medium tracking-wide">Product Listing</span>
+            </div>
+           
+           
+          </div>
+          <div class="absolute top-4 left-4 flex gap-2 z-10">
+          </div>
+          <button class="cs-btn prev" onclick="csMove(this,-1)" aria-label="Previous">
+            <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M15 19l-7-7 7-7"/></svg>
+          </button>
+          <button class="cs-btn next" onclick="csMove(this,1)" aria-label="Next">
+            <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M9 5l7 7-7 7"/></svg>
+          </button>
+          <div class="cs-counter"><span class="cs-cur">1</span> / <span class="cs-tot">4</span></div>
+        </div>
+        <div class="p-7">
+          <h3 class="font-serif text-2xl text-[#1a1f2e] mb-2">E-commerce Website Redesign</h3>
+          <p class="text-[#1a1f2e]/50 text-sm leading-relaxed mb-6 font-light">
+This project is a fun UI/UX concept for a Kinder Joy – DC Edition shopping experience, focused on blending playful visuals with a clean and modern interface. The design highlights a gender-based product switch for boys and girls variants, integrates DC superhero themes to enhance brand personality, and uses smooth navigation with subtle gradients for a polished feel. Key elements include toy highlights with character previews and a vibrant hero section designed to feel fresh, bright, and energetic. The overall goal was to capture the joy and surprise associated with Kinder Joy while presenting it through a refined, e-commerce-ready visual identity, helping me explore how playful branding can be balanced with usability and modern design principles.          </p>
+          <a href="https://www.linkedin.com/posts/pon-karan_uiuxdesign-uidesign-uxdesign-activity-7400451412230586368-yo95?utm_source=share&utm_medium=member_desktop&rcm=ACoAAE4DxVoB6oNf9r4WqpzbplMttA2_uB13OnA" class="inline-flex items-center gap-2 text-sm font-semibold text-[#5f866a] hover:text-[#4a6e55] transition-colors group">
+           know more
+            <svg class="w-4 h-4 transition-transform group-hover:translate-x-1" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg>
+          </a>
+        </div>
+      </div>
+
+      <!-- ── P3: Travel ── -->
+      <div class="reveal card-lift cs-card bg-white rounded-3xl overflow-hidden border border-[#f3ede4] shadow-sm" data-carousel>
+        <div class="cs-viewport">
+          <div class="cs-track">
+            <div class="cs-slide bg-gradient-to-br from-teal-100 via-emerald-50 to-[#f3ede4] flex flex-col items-center justify-center gap-3">
+              <img src="pro3.jpg" alt=""><div class="w-16 h-16 rounded-2xl bg-orange-200/80 flex items-center justify-center shadow-sm">
+                <svg class="w-8 h-8 text-teal-600" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path stroke-linecap="round" stroke-linejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+              </div>
+              <span class="text-teal-500/60 text-xs font-medium tracking-wide">Explore Screen</span>
+            </div>
+            <div class="cs-slide bg-gradient-to-br from-emerald-100 via-teal-100 to-cyan-50 flex flex-col items-center justify-center gap-3">
+              <img src="pro31.jpg" alt=""><div class="w-16 h-16 rounded-2xl bg-orange-200/80 flex items-center justify-center shadow-sm">
+                <svg class="w-8 h-8 text-emerald-600" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+              </div>
+              <span class="text-emerald-500/60 text-xs font-medium tracking-wide">Trip Planner</span>
+            </div>
+            <div class="cs-slide bg-gradient-to-br from-cyan-100 via-teal-50 to-emerald-100 flex flex-col items-center justify-center gap-3">
+              <img src="pro32.jpg" alt=""><div class="w-16 h-16 rounded-2xl bg-orange-200/80 flex items-center justify-center shadow-sm">
+                <svg class="w-8 h-8 text-cyan-600" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7"/></svg>
+              </div>
+              <span class="text-cyan-500/60 text-xs font-medium tracking-wide">Map View</span>
+            </div>
+             <div class="cs-slide bg-gradient-to-br from-cyan-100 via-teal-50 to-emerald-100 flex flex-col items-center justify-center gap-3">
+              <img src="pro33.jpg" alt=""><div class="w-16 h-16 rounded-2xl bg-orange-200/80 flex items-center justify-center shadow-sm">
+                <svg class="w-8 h-8 text-cyan-600" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7"/></svg>
+              </div>
+              <span class="text-cyan-500/60 text-xs font-medium tracking-wide">Map View</span>
+            </div>
+          </div>
+          <div class="absolute top-4 left-4 flex gap-2 z-10">
+          </div>
+          <button class="cs-btn prev" onclick="csMove(this,-1)" aria-label="Previous">
+            <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M15 19l-7-7 7-7"/></svg>
+          </button>
+          <button class="cs-btn next" onclick="csMove(this,1)" aria-label="Next">
+            <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M9 5l7 7-7 7"/></svg>
+          </button>
+          <div class="cs-counter"><span class="cs-cur">1</span> / <span class="cs-tot">3</span></div>
+        </div>
+        <div class="p-7">
+          <h3 class="font-serif text-2xl text-[#1a1f2e] mb-2">Travel App UX Case Study</h3>
+          <p class="text-[#1a1f2e]/50 text-sm leading-relaxed mb-6 font-light">
+This project is a UI/UX concept for Amul’s Milkshake Series, focused on creating a bold and visually engaging product experience with a premium FMCG aesthetic. The design emphasizes product-centric hero layouts, where each flavour is given a distinct personality through consistent color psychology—from subtle blueberry tones to vibrant strawberry hues. It incorporates smooth gradients, clean and modern typography for a high-end feel, and floating ingredient elements to add depth and realism. The overall presentation is enhanced with high-quality mockups, aiming to deliver a polished and immersive visual experience while strengthening my ability to combine branding, aesthetics, and user-focused design in product-based interfaces.          </p>
+          <a href="https://www.linkedin.com/posts/pon-karan_uiuxdesign-figmadesign-productdesign-activity-7398640640214908928-cXkq?utm_source=share&utm_medium=member_desktop&rcm=ACoAAE4DxVoB6oNf9r4WqpzbplMttA2_uB13OnA" class="inline-flex items-center gap-2 text-sm font-semibold text-[#5f866a] hover:text-[#4a6e55] transition-colors group">
+           know more
+            <svg class="w-4 h-4 transition-transform group-hover:translate-x-1" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg>
+          </a>
+        </div>
+      </div>
+
+      <!-- ── P4: Portfolio ── -->
+      <div class="reveal card-lift cs-card bg-white rounded-3xl overflow-hidden border border-[#f3ede4] shadow-sm" data-carousel>
+        <div class="cs-viewport">
+          <div class="cs-track">
+            <div class="cs-slide bg-gradient-to-br from-[#e8ddd0] via-[#f3ede4] to-white flex flex-col items-center justify-center gap-3">
+              <img src="pro4.jpg" alt=""><div class="w-16 h-16 rounded-2xl bg-orange-200/80 flex items-center justify-center shadow-sm">
+                <svg class="w-8 h-8 text-[#b09478]" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 5a1 1 0 011-1h14a1 1 0 011 1v2a1 1 0 01-1 1H5a1 1 0 01-1-1V5zM4 13a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H5a1 1 0 01-1-1v-6zM16 13a1 1 0 011-1h2a1 1 0 011 1v6a1 1 0 01-1 1h-2a1 1 0 01-1-1v-6z"/></svg>
+              </div>
+              <span class="text-[#b09478]/60 text-xs font-medium tracking-wide">Hero Design</span>
+            </div>
+            <div class="cs-slide bg-gradient-to-br from-[#d9c9b6] via-[#e8ddd0] to-[#f3ede4] flex flex-col items-center justify-center gap-3">
+              <img src="pro41.jpg" alt=""><div class="w-16 h-16 rounded-2xl bg-orange-200/80 flex items-center justify-center shadow-sm">
+                <svg class="w-8 h-8 text-[#b09478]" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01"/></svg>
+              </div>
+              <span class="text-[#b09478]/60 text-xs font-medium tracking-wide">Style Guide</span>
+            </div>
+            <div class="cs-slide bg-gradient-to-br from-[#f3ede4] via-[#e8ddd0] to-[#d9c9b6] flex flex-col items-center justify-center gap-3">
+              <img src="pro42.jpg" alt=""><div class="w-16 h-16 rounded-2xl bg-orange-200/80 flex items-center justify-center shadow-sm">
+                <svg class="w-8 h-8 text-[#b09478]" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z"/></svg>
+              </div>
+              <span class="text-[#b09478]/60 text-xs font-medium tracking-wide">Mobile View</span>
+            </div>
+          </div>
+          <div class="absolute top-4 left-4 flex gap-2 z-10">
+            <span class="tag bg-[#e8ddd0] text-[#b09478] px-3 py-1 rounded-full">Portfolio</span>
+            <span class="tag bg-white/70 text-[#1a1f2e]/55 px-3 py-1 rounded-full">Branding</span>
+          </div>
+          <button class="cs-btn prev" onclick="csMove(this,-1)" aria-label="Previous">
+            <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M15 19l-7-7 7-7"/></svg>
+          </button>
+          <button class="cs-btn next" onclick="csMove(this,1)" aria-label="Next">
+            <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M9 5l7 7-7 7"/></svg>
+          </button>
+          <div class="cs-counter"><span class="cs-cur">1</span> / <span class="cs-tot">3</span></div>
+        </div>
+        <div class="p-7">
+          <h3 class="font-serif text-2xl text-[#1a1f2e] mb-2">Portfolio Website Design</h3>
+          <p class="text-[#1a1f2e]/50 text-sm leading-relaxed mb-6 font-light">
+This project is a UI/UX concept for a Royal Enfield Classic 350 landing page, designed to deliver a bold and premium visual experience while maintaining a clean and user-friendly interface. The design focuses on a strong hero layout with product-centered visuals, enhanced by smooth gradient backgrounds to create a modern aesthetic. It incorporates clean and balanced typography, along with compact specification cards for quick and easy readability. The project also follows a well-structured Figma component workflow to ensure consistency and scalability. Overall, this work helped me refine my visual consistency, layout structuring, and presentation approach while designing a product-focused interface.          </p>
+          <a href="https://www.linkedin.com/posts/pon-karan_uiuxdesign-uidesign-uxdesign-activity-7397988781229838337-npVn?utm_source=share&utm_medium=member_desktop&rcm=ACoAAE4DxVoB6oNf9r4WqpzbplMttA2_uB13OnA" class="inline-flex items-center gap-2 text-sm font-semibold text-[#5f866a] hover:text-[#4a6e55] transition-colors group">
+            Know more
+            <svg class="w-4 h-4 transition-transform group-hover:translate-x-1" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg>
+          </a>
+        </div>
+      </div>
+
+    </div><!-- /grid -->
+  </div>
+</section>
+
+<!-- ========== TESTIMONIALS ========== -->
+<section id="testimonials" class="py-24 lg:py-32 bg-[#f3ede4] relative overflow-hidden">
+  <div class="blob w-72 h-72 bg-white/60 right-0 top-0"></div>
+
+  <div class="max-w-6xl mx-auto px-6 relative z-10">
+    <div class="text-center mb-16 reveal">
+      <div class="flex items-center justify-center gap-3 mb-5">
+        <span class="dot"></span>
+        <span class="text-xs font-semibold tracking-widest uppercase text-[#5f866a]">Testimonials</span>
+      </div>
+      <h2 class="font-serif text-4xl lg:text-5xl text-[#1a1f2e] leading-tight">
+        What people <em class="not-italic text-[#5f866a]">say</em>
+      </h2>
+    </div>
+
+    <div class="grid md:grid-cols-2 gap-7">
+      <!-- T1 -->
+      <div class="reveal card-lift bg-white rounded-3xl p-8 border border-[#e8ddd0] shadow-sm relative overflow-hidden">
+        <div class="quote-mark">&#8220;</div>
+        <div class="flex items-center gap-4 mb-6 relative z-10">
+          <div class="w-14 h-14 rounded-full bg-gradient-to-br from-[#e8ddd0] to-[#d9c9b6] flex items-center justify-center flex-shrink-0 shadow-inner" >
+            <svg class="w-7 h-7 text-[#b09478]" fill="currentColor" viewBox="0 0 24 24"><path d="M12 12c2.7 0 4.8-2.1 4.8-4.8S14.7 2.4 12 2.4 7.2 4.5 7.2 7.2 9.3 12 12 12zm0 2.4c-3.2 0-9.6 1.6-9.6 4.8v2.4h19.2v-2.4c0-3.2-6.4-4.8-9.6-4.8z"/></svg>
+          </div>
+          <div>
+            <a href=""></a><p class="font-semibold text-[#1a1f2e]">Naveen Prasath S</p>
+            <p class="text-xs text-[#5f866a] font-medium mt-0.5">Data Analyst</p>
+            <div class="flex gap-0.5 mt-1.5">
+              <svg class="w-3.5 h-3.5 text-amber-400" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+              <svg class="w-3.5 h-3.5 text-amber-400" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+              <svg class="w-3.5 h-3.5 text-amber-400" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+              <svg class="w-3.5 h-3.5 text-amber-400" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+              <svg class="w-3.5 h-3.5 text-amber-400" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+            </div>
+          </div>
+        </div>
+        <p class="text-[#1a1f2e]/55 leading-relaxed font-light text-sm relative z-10">
+"His attention to detail and user-centered approach made my portfolio clean and beautiful. Highly recommended!"        </p>
+      </div>
+
+      <!-- T2 -->
+      <div class="reveal card-lift bg-white rounded-3xl p-8 border border-[#e8ddd0] shadow-sm relative overflow-hidden">
+        <div class="quote-mark">&#8220;</div>
+        <div class="flex items-center gap-4 mb-6 relative z-10">
+          <div class="w-14 h-14 rounded-full bg-gradient-to-br from-[#7a9e7e]/20 to-[#5f866a]/30 flex items-center justify-center flex-shrink-0 shadow-inner">
+            <svg class="w-7 h-7 text-[#5f866a]" fill="currentColor" viewBox="0 0 24 24"><path d="M12 12c2.7 0 4.8-2.1 4.8-4.8S14.7 2.4 12 2.4 7.2 4.5 7.2 7.2 9.3 12 12 12zm0 2.4c-3.2 0-9.6 1.6-9.6 4.8v2.4h19.2v-2.4c0-3.2-6.4-4.8-9.6-4.8z"/></svg>
+          </div>
+          <div>
+            <a href="https://webdesignpk.github.io/Noor-mohamed/"><p class="font-semibold text-[#1a1f2e]">Noor Mohamed M</p></a>
+            <p class="text-xs text-[#5f866a] font-medium mt-0.5">Student at MRCAS&amp; Client</p>
+            <div class="flex gap-0.5 mt-1.5">
+              <svg class="w-3.5 h-3.5 text-amber-400" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+              <svg class="w-3.5 h-3.5 text-amber-400" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+              <svg class="w-3.5 h-3.5 text-amber-400" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+              <svg class="w-3.5 h-3.5 text-amber-400" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+              <svg class="w-3.5 h-3.5 text-amber-200" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+            </div>
+          </div>
+        </div>
+        <p class="text-[#1a1f2e]/55 leading-relaxed font-light text-sm relative z-10">
+          Pon Karan redesigned our product's onboarding flow and the impact was immediate — user drop-off reduced significantly within the first week. What impressed me most was their deep curiosity in understanding our users before touching a single design tool. A true UX thinker.
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ========== CONTACT ========== -->
+<section id="contact" class="py-24 lg:py-32 relative overflow-hidden">
+  <div class="blob w-96 h-96 bg-[#7a9e7e]/10 -right-24 top-0"></div>
+  <div class="blob w-64 h-64 bg-[#e8ddd0]/50 -left-10 bottom-0"></div>
+
+  <div class="max-w-6xl mx-auto px-6 relative z-10">
+    <div class="grid lg:grid-cols-2 gap-16 items-start">
+
+      <div class="reveal">
+        <div class="flex items-center gap-3 mb-5">
+          <span class="dot"></span>
+          <span class="text-xs font-semibold tracking-widest uppercase text-[#5f866a]">Contact</span>
+        </div>
+        <h2 class="font-serif text-4xl lg:text-5xl text-[#1a1f2e] leading-tight mb-6">
+          Let's create<br/>something <em class="not-italic text-[#5f866a]">together</em>
+        </h2>
+        <p class="text-[#1a1f2e]/50 font-light leading-relaxed mb-10 max-w-md">
+          Whether it's a freelance opportunity, collaboration, or just a design chat — I'd love to hear from you. Drop me a message and I'll get back within 24 hours.
+        </p>
+
+        <div class="space-y-4">
+          <div class="flex items-center gap-3 text-[#1a1f2e]/55">
+            <div class="w-9 h-9 rounded-xl bg-[#f3ede4] flex items-center justify-center flex-shrink-0">
+              <svg class="w-4 h-4 text-[#5f866a]" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+            </div>
+            <span class="text-sm font-medium">karan271106.com</span>
+          </div>
+          <div class="flex items-center gap-3 text-[#1a1f2e]/55">
+            <div class="w-9 h-9 rounded-xl bg-[#f3ede4] flex items-center justify-center flex-shrink-0">
+              <svg class="w-4 h-4 text-[#5f866a]" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path stroke-linecap="round" stroke-linejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+            </div>
+            <span class="text-sm font-medium">Madurai, Tamil Nadu, India</span>
+          </div>
+        </div>
+
+        <!-- social -->
+        <div class="mt-10 flex items-center gap-3">
+          <a href="https://www.linkedin.com/in/pon-karan/" aria-label="LinkedIn" class="social-icon w-10 h-10 rounded-full bg-[#f3ede4] hover:bg-[#e8ddd0] flex items-center justify-center text-[#1a1f2e]/50 transition-all">
+            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.064 2.064 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
+          </a>
+          <a href="https://dribbble.com/Ponkaran" aria-label="Dribbble" class="social-icon w-10 h-10 rounded-full bg-[#f3ede4] hover:bg-[#e8ddd0] flex items-center justify-center text-[#1a1f2e]/50 transition-all">
+            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M12 24C5.385 24 0 18.615 0 12S5.385 0 12 0s12 5.385 12 12-5.385 12-12 12zm10.12-10.358c-.35-.11-3.17-.953-6.384-.438 1.34 3.684 1.887 6.684 1.992 7.308 2.3-1.555 3.936-4.02 4.395-6.87zm-6.115 7.808c-.153-.9-.75-4.032-2.19-7.77l-.066.02c-5.79 2.015-7.86 6.025-8.04 6.4 1.73 1.358 3.92 2.166 6.29 2.166 1.42 0 2.77-.29 4-.816zm-11.62-2.59c.235-.394 3.096-5.143 8.33-6.808.091-.03.181-.06.27-.085-.17-.389-.35-.779-.53-1.17-5.14 1.542-10.148 1.48-10.612 1.47-.013.26-.02.525-.02.79 0 2.33.851 4.47 2.254 6.12zm-2.173-7.925c.478.008 4.898.033 9.718-1.24-1.742-3.093-3.626-5.695-3.906-6.086-2.695 1.27-4.73 3.61-5.812 6.326zM17.26 3.326c-.29-.42-2.165-3.046-5.635-3.046-1.615 0-3.117.587-4.28 1.542.278.393 2.23 3.01 3.944 6.175 3.386-1.268 5.827-3.198 5.97-4.67z"/></svg>
+          </a>
+        </div>
+      </div>
+
+      <!-- form -->
+      <div class="reveal">
+        <div class="bg-white rounded-3xl p-8 border border-[#f3ede4] shadow-sm">
+          <h3 class="font-serif text-2xl text-[#1a1f2e] mb-7">Send a message</h3>
+          <div class="space-y-5">
+            <div>
+               <form target="_blank" action="https://formsubmit.co/karan271106@gmail.com" method="POST">
+              <label class="block text-xs font-semibold text-[#1a1f2e]/50 uppercase tracking-wider mb-2">Your Name</label>
+              <input type="text" placeholder="e.g. Arjun Kumar" class="form-input w-full bg-[#faf8f5] border border-[#e8ddd0] rounded-xl px-4 py-3.5 text-sm text-[#1a1f2e] placeholder-[#1a1f2e]/25 transition-all" />
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-[#1a1f2e]/50 uppercase tracking-wider mb-2">Email Address</label>
+              <input type="email" placeholder="you@email.com" class="form-input w-full bg-[#faf8f5] border border-[#e8ddd0] rounded-xl px-4 py-3.5 text-sm text-[#1a1f2e] placeholder-[#1a1f2e]/25 transition-all" />
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-[#1a1f2e]/50 uppercase tracking-wider mb-2">Message</label>
+              <textarea rows="5" placeholder="Tell me about your project or opportunity..." class="form-input w-full bg-[#faf8f5] border border-[#e8ddd0] rounded-xl px-4 py-3.5 text-sm text-[#1a1f2e] placeholder-[#1a1f2e]/25 transition-all resize-none"></textarea>
+            </div>
+            <button class="btn-dark w-full py-4 rounded-xl font-semibold text-sm inline-flex items-center justify-center gap-2 shadow-lg shadow-[#1a1f2e]/10">
+              Send Message
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"/></svg>
+            </button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ========== FOOTER ========== -->
+<footer class="bg-[#1a1f2e] py-12">
+  <div class="max-w-6xl mx-auto px-6">
+    <div class="flex flex-col md:flex-row items-center justify-between gap-6">
+      <a href="#hero" class="font-serif text-2xl text-[#f3ede4] tracking-tight">PK<span class="text-[#7a9e7e]">.</span></a>
+      <ul class="flex flex-wrap justify-center gap-6 text-xs font-medium text-[#d9c9b6]/40">
+        <li><a href="#about"        class="hover:text-[#d9c9b6] transition-colors">About</a></li>
+        <li><a href="#skills"       class="hover:text-[#d9c9b6] transition-colors">Skills</a></li>
+        <li><a href="#projects"     class="hover:text-[#d9c9b6] transition-colors">Projects</a></li>
+        <li><a href="#testimonials" class="hover:text-[#d9c9b6] transition-colors">Testimonials</a></li>
+        <li><a href="#contact"      class="hover:text-[#d9c9b6] transition-colors">Contact</a></li>
+      </ul>
+      <div class="flex items-center gap-3">
+        <a href="https://www.linkedin.com/in/pon-karan/" aria-label="LinkedIn" class="social-icon text-[#d9c9b6]/30 hover:text-[#7a9e7e]"><svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.064 2.064 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg></a>
+        <a href="https://dribbble.com/Ponkaran" aria-label="Dribbble" class="social-icon text-[#d9c9b6]/30 hover:text-[#7a9e7e]"><svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M12 24C5.385 24 0 18.615 0 12S5.385 0 12 0s12 5.385 12 12-5.385 12-12 12zm10.12-10.358c-.35-.11-3.17-.953-6.384-.438 1.34 3.684 1.887 6.684 1.992 7.308 2.3-1.555 3.936-4.02 4.395-6.87zm-6.115 7.808c-.153-.9-.75-4.032-2.19-7.77l-.066.02c-5.79 2.015-7.86 6.025-8.04 6.4 1.73 1.358 3.92 2.166 6.29 2.166 1.42 0 2.77-.29 4-.816zm-11.62-2.59c.235-.394 3.096-5.143 8.33-6.808.091-.03.181-.06.27-.085-.17-.389-.35-.779-.53-1.17-5.14 1.542-10.148 1.48-10.612 1.47-.013.26-.02.525-.02.79 0 2.33.851 4.47 2.254 6.12zm-2.173-7.925c.478.008 4.898.033 9.718-1.24-1.742-3.093-3.626-5.695-3.906-6.086-2.695 1.27-4.73 3.61-5.812 6.326zM17.26 3.326c-.29-.42-2.165-3.046-5.635-3.046-1.615 0-3.117.587-4.28 1.542.278.393 2.23 3.01 3.944 6.175 3.386-1.268 5.827-3.198 5.97-4.67z"/></svg></a>
+      </div>
+    </div>
+    <div class="border-t border-white/10 mt-8 pt-8 text-center">
+      <p class="text-[#d9c9b6]/30 text-xs">© 2026 Pon Karan. Crafted with <span class="text-[#7a9e7e]">♥</span> and intention. All rights reserved.</p>
+    </div>
+  </div>
+</footer>
+
+<script>
+  /* ── Mobile menu ── */
+  function toggleMenu() {
+    const m = document.getElementById('mobile-menu');
+    const o = document.getElementById('icon-open');
+    const c = document.getElementById('icon-close');
+    m.classList.toggle('open');
+    o.classList.toggle('hidden');
+    c.classList.toggle('hidden');
+  }
+
+  /* ── Scroll reveal ── */
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting) { e.target.classList.add('revealed'); observer.unobserve(e.target); }
+    });
+  }, { threshold: 0.12 });
+  document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+
+  /* ── Progress bar animation ── */
+  const barObserver = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        e.target.querySelectorAll('.bar').forEach(b => b.classList.add('animate'));
+        barObserver.unobserve(e.target);
+      }
+    });
+  }, { threshold: 0.3 });
+  document.querySelectorAll('#skills').forEach(el => barObserver.observe(el));
+
+  /* ── Carousel engine ── */
+  // State map: card element → { cur, total, timer }
+  const csState = new WeakMap();
+
+  function csInit(card) {
+    const track  = card.querySelector('.cs-track');
+    const slides = card.querySelectorAll('.cs-slide');
+    const cur    = card.querySelector('.cs-cur');
+    const tot    = card.querySelector('.cs-tot');
+    const n      = slides.length;
+    tot.textContent = n;
+    const state = { idx: 0, total: n };
+    csState.set(card, state);
+
+    function goTo(i) {
+      state.idx = ((i % n) + n) % n;        // wrap around
+      track.style.transform = `translateX(-${state.idx * 100}%)`;
+      cur.textContent = state.idx + 1;
+    }
+
+    // auto-play every 3.2 s, pause on hover
+    let timer = setInterval(() => goTo(state.idx + 1), 3200);
+    card.addEventListener('mouseenter', () => clearInterval(timer));
+    card.addEventListener('mouseleave', () => {
+      clearInterval(timer);
+      timer = setInterval(() => goTo(state.idx + 1), 3200);
+    });
+
+    state.goTo = goTo;
+  }
+
+  // Manual arrow clicks (delegated via onclick on buttons)
+  function csMove(btn, dir) {
+    const card = btn.closest('[data-carousel]');
+    const st   = csState.get(card);
+    if (st) st.goTo(st.idx + dir);
+  }
+
+  // Touch / swipe support per card
+  function addSwipe(card) {
+    let x0 = null;
+    card.addEventListener('touchstart', e => { x0 = e.touches[0].clientX; }, { passive: true });
+    card.addEventListener('touchend', e => {
+      if (x0 === null) return;
+      const dx = e.changedTouches[0].clientX - x0;
+      if (Math.abs(dx) > 40) {
+        const st = csState.get(card);
+        if (st) st.goTo(st.idx + (dx < 0 ? 1 : -1));
+      }
+      x0 = null;
+    });
+  }
+
+  document.querySelectorAll('[data-carousel]').forEach(card => {
+    csInit(card);
+    addSwipe(card);
+  });
+</script>
+</body>
+</html>
